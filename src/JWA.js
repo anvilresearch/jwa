@@ -5,8 +5,8 @@
  * - switch between Node.js webcrypto package and browser implementation
  */
 const base64url = require('base64url')
-const supportedAlgorithms = require('../algorithms')
-const {NotSupportedError} = require('../errors')
+const supportedAlgorithms = require('./algorithms')
+const {NotSupportedError} = require('./errors')
 
 /**
  * JWA

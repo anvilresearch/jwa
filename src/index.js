@@ -1,32 +1,12 @@
 /**
- * @module JSON Object Signing and Encryption (JOSE)
+ * @module JSON Web Algorithms (JWA)
  */
-const JWA = require('./jose/JWA')
-const JWK = require('./jose/JWK')
-const JWKSet = require('./jose/JWKSet')
-const JWT = require('./jose/JWT')
-const JWD = require('./jose/JWD')
-const Base64URLSchema = require('./schemas/Base64URLSchema')
-const JOSEHeaderSchema = require('./schemas/JOSEHeaderSchema')
-const JWKSchema = require('./schemas/JWKSchema')
-const JWKSetSchema = require('./schemas/JWKSetSchema')
-const JWTClaimsSetSchema = require('./schemas/JWTClaimsSetSchema')
-const JWTSchema = require('./schemas/JWTSchema')
+const JWA = require('./JWA')
 
 
 /**
  * Export
  */
 module.exports = {
-  JWA,
-  JWK,
-  JWKSet,
-  JWT,
-  JWD,
-  Base64URLSchema,
-  JOSEHeaderSchema,
-  JWKSchema,
-  JWKSetSchema,
-  JWTClaimsSetSchema,
-  JWTSchema
+  JWA
 }

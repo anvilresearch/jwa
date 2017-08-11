@@ -89,6 +89,25 @@ class JWA {
     let normalizedAlgorithm = supportedAlgorithms.normalize('importKey', key.alg)
     return normalizedAlgorithm.importKey(key)
   }
+
+  /**
+   * generateKey
+   */
+  static generateKey (alg, descriptor) {
+    let { key_ops, modulusLength, extractable = true } = descriptor
+    let normalizedAlgorithm = supportedAlgorithms.normalize('generateKey', alg)
+
+    if (normalizedAlgorithm instanceof Error) {
+      return Promise.reject(new NotSupportedError(alg))
+    }
+
+    // RSA
+    if (modulusLength) {
+      normalizedAlgorithm.params.modulusLength = modulusLength
+    }
+
+    return normalizedAlgorithm.generateKey(extractable, key_ops)
+  }
 }
 
 /**

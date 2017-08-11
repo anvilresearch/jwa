@@ -80,6 +80,18 @@ class RSASSA_PKCS1_v1_5 {
   }
 
   /**
+   * generateKey
+   *
+   * @param  {Array}  usages
+   * @param  {Boolean} extractable
+   * @return {Promise}
+   */
+  generateKey (extractable, usages) {
+    return crypto.subtle
+      .generateKey(this.params, extractable, usages)
+  }
+
+  /**
    * importKey
    *
    * @param {JWK} key

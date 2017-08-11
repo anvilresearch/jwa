@@ -70,4 +70,30 @@ describe('JWA', () => {
         .should.eventually.equal(true)
     })
   })
+
+  describe('generateKey', () => {
+    it('should return a promise', () => {
+      let alg = 'RS256'
+
+      return JWA.generateKey(alg, {
+        name: 'anything',
+        alg,
+        modulusLength: 2048, // Default is 4096
+        key_ops: ['sign', 'verify'],
+        tags: ['pop_token']
+      }).should.be.fulfilled
+    })
+
+    it('should reject unsupported algorithm', () => {
+      let alg = 'RS257'
+
+      return JWA.generateKey(alg, {
+        name: 'anything',
+        alg,
+        modulusLength: 2048, // Default is 4096
+        key_ops: ['sign', 'verify'],
+        tags: ['pop_token']
+      }).should.be.rejectedWith(NotSupportedError)
+    })
+  })
 })

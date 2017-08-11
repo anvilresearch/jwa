@@ -115,6 +115,10 @@ class JWA {
       return Promise.reject(new NotSupportedError(alg))
     }
 
+    if (!key_ops) {
+      return Promise.reject(new DataError('Invalid key_ops'))
+    }
+
     // RSA
     if (modulusLength) {
       normalizedAlgorithm.params.modulusLength = modulusLength

@@ -229,6 +229,17 @@ supportedAlgorithms.define('ES512', 'importKey', new ECDSA({
 }))
 
 /**
+ * Generate Key
+ */
+supportedAlgorithms.define('RS256', 'generateKey', new RSASSA_PKCS1_v1_5({
+  name: 'RSASSA-PKCS1-v1_5',
+  modulusLength: 2048,
+  hash: {
+    name: 'SHA-256'
+  }
+}))
+
+/**
  * Export
  */
 module.exports = supportedAlgorithms

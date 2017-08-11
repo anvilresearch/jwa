@@ -7,6 +7,7 @@
 const base64url = require('base64url')
 const supportedAlgorithms = require('./algorithms')
 const {NotSupportedError} = require('./errors')
+const crypto = require('@trust/webcrypto')
 
 /**
  * JWA
@@ -86,12 +87,25 @@ class JWA {
    * Import
    */
   static importKey (key) {
-    let normalizedAlgorithm = supportedAlgorithms.normalize('importKey', key.alg)
+    let { alg } = key
+    let normalizedAlgorithm = supportedAlgorithms.normalize('importKey', alg)
+
+    if (normalizedAlgorithm instanceof Error) {
+      return Promise.reject(new NotSupportedError(alg))
+    }
+
     return normalizedAlgorithm.importKey(key)
   }
 
   /**
-   * generateKey
+   * Export
+   */
+  static exportKey (format, key) {
+    return crypto.subtle.exportKey(format, key)
+  }
+
+  /**
+   * Generate
    */
   static generateKey (alg, descriptor) {
     let { key_ops, modulusLength, extractable = true } = descriptor

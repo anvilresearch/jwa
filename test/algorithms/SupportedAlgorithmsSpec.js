@@ -38,7 +38,8 @@ describe('SupportedAlgorithms', () => {
         'verify',
         'encrypt',
         'decrypt',
-        'importKey'
+        'importKey',
+        'generateKey'
       ])
     })
   })

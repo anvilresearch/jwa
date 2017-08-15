@@ -47,7 +47,7 @@ class JWA {
    * Verify a digital signature.
    *
    * @param {string} alg
-   * @param {CryptoKey} privateKey
+   * @param {CryptoKey} key
    * @param {string|Buffer} signature
    * @param {string|Buffer} data
    *
@@ -61,9 +61,6 @@ class JWA {
     if (normalizedAlgorithm instanceof Error) {
       return Promise.reject(new NotSupportedError(alg))
     }
-
-    // TODO
-    // validate publicKey
 
     // verify the signature
     return normalizedAlgorithm.verify(key, signature, data)
@@ -104,7 +101,7 @@ class JWA {
    *
    * @param {string} alg
    * @param {CryptoKey} key
-   * @param {string\Buffer} data
+   * @param {string|Buffer} data
    * @param {string|Buffer} iv
    * @param {string|Buffer} tag
    * @param {string|Buffer} aad
@@ -128,7 +125,7 @@ class JWA {
    * encryptKey
    *
    * @description
-   * Encrypt or wrap key using the specifed algorithm and the wrappingKey
+   * Encrypt or wrap key using the specifed algorithm and the wrappingKey.
    *
    * @param {string} alg
    * @param {CryptoKey} key
@@ -152,7 +149,7 @@ class JWA {
    * decryptKey
    *
    * @description
-   * Decrypt or unwrap a wrappedKey
+   * Decrypt or unwrap a wrappedKey.
    *
    * @param {string} alg
    * @param {string|Buffer} wrappedKey
@@ -177,26 +174,23 @@ class JWA {
    * agreeKey
    *
    * @description
+   * Agree on a new key and optionally wrap it with a provided wrappingKey.
    *
-   * @param {BufferSource} wrappedKey
-   * @param {CryptoKey} unwrappingKey
-   * @param {AlgorithmIdentifier} unwrapAlgorithm
-   * @param {AlgorithmIdentifier} unwrappedKeyAlgorithm
-   * @param {Boolean} extractable
-   * @param {Array} keyUsages
+   * @param {string} alg
+   * @param {CryptoKey} wrappingKey
    *
    * @returns {Promise}
    */
-  static agreeKey (unwrapAlg, wrappedKey, unwrappingKey, unwrappedKeyAlg) {
+  static agreeKey (alg, wrappingKey) {
     // normalize the algorithm
-    let normalizedAlgorithm = supportedAlgorithms.normalize('agreeKey', unwrapAlg)
+    let normalizedAlgorithm = supportedAlgorithms.normalize('agreeKey', alg)
 
     // validate algorithm is supported
     if (normalizedAlgorithm instanceof Error) {
-      return Promise.reject(new NotSupportedError(wrapAlg))
+      return Promise.reject(new NotSupportedError(alg))
     }
 
-    return normalizedAlgorithm.wrapKey(wrappedKey, unwrappingKey, unwrappedKeyAlg)
+    return normalizedAlgorithm.agreeKey(wrappingKey)
   }
 
   /**

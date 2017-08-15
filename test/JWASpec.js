@@ -17,9 +17,9 @@ let expect = chai.expect
  * Code under test
  */
 const crypto = require('@trust/webcrypto')
-const {NotSupportedError} = require('../src/errors')
+const { NotSupportedError } = require('../src/errors')
 const JWA = require('../src/JWA')
-const {RsaPrivateCryptoKey, RsaPublicCryptoKey} = require('./keys')
+const { RsaPrivateCryptoKey, RsaPublicCryptoKey, RsaPublicJwk } = require('./keys')
 
 /**
  * Tests
@@ -68,6 +68,14 @@ describe('JWA', () => {
     it('should resolve a boolean', () => {
       return JWA.verify('RS256', RsaPublicCryptoKey, signature, data)
         .should.eventually.equal(true)
+    })
+  })
+
+  describe('importKey', () => {
+    it('should resolve a public key', () => {
+      RsaPublicJwk.alg = 'RS256'
+      return JWA.importKey(RsaPublicJwk)
+      .catch(console.log)
     })
   })
 })

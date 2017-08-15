@@ -237,6 +237,47 @@ supportedAlgorithms.define('ES512', 'verify', new ECDSA({
 //supportedAlgorithms.define('PS512', 'verify', {})
 supportedAlgorithms.define('none', 'verify', {})
 
+/*
+ * encryptKey
+ */
+// supportedAlgorithms.define('RSA1_5', 'encryptKey', {}))
+// supportedAlgorithms.define('RSA-OAEP', 'encryptKey', {})
+// supportedAlgorithms.define('RSA-OAEP-256', 'encryptKey', {})
+// supportedAlgorithms.define('A128KW', 'encryptKey', {})
+// supportedAlgorithms.define('A192KW', 'encryptKey', {})
+// supportedAlgorithms.define('A256KW', 'encryptKey', {})
+// supportedAlgorithms.define('A128GCMKW', 'encryptKey', {})
+// supportedAlgorithms.define('A192GCMKW', 'encryptKey', {})
+// supportedAlgorithms.define('A256GCMKW', 'encryptKey', {})
+// supportedAlgorithms.define('PBES2-HS256+A128KW', 'encryptKey', {})
+// supportedAlgorithms.define('PBES2-HS384+A192KW', 'encryptKey', {})
+// supportedAlgorithms.define('PBES2-HS512+A256KW', 'encryptKey', {})
+
+/*
+ * decryptKey
+ */
+// supportedAlgorithms.define('RSA1_5', 'decryptKey', {}))
+// supportedAlgorithms.define('RSA-OAEP', 'decryptKey', {})
+// supportedAlgorithms.define('RSA-OAEP-256', 'decryptKey', {})
+// supportedAlgorithms.define('A128KW', 'decryptKey', {})
+// supportedAlgorithms.define('A192KW', 'decryptKey', {})
+// supportedAlgorithms.define('A256KW', 'decryptKey', {})
+// supportedAlgorithms.define('A128GCMKW', 'decryptKey', {})
+// supportedAlgorithms.define('A192GCMKW', 'decryptKey', {})
+// supportedAlgorithms.define('A256GCMKW', 'decryptKey', {})
+// supportedAlgorithms.define('PBES2-HS256+A128KW', 'decryptKey', {})
+// supportedAlgorithms.define('PBES2-HS384+A192KW', 'decryptKey', {})
+// supportedAlgorithms.define('PBES2-HS512+A256KW', 'decryptKey', {})
+
+/*
+ * agreeKey
+ */
+// supportedAlgorithms.define('dir', 'agreeKey', {})
+// supportedAlgorithms.define('ECDH-ES', 'agreeKey', {})
+// supportedAlgorithms.define('ECDH-ES+A128KW', 'agreeKey', {})
+// supportedAlgorithms.define('ECDH-ES+A192KW', 'agreeKey', {})
+// supportedAlgorithms.define('ECDH-ES+A256KW', 'agreeKey', {})
+
 /**
  * importKey
  */

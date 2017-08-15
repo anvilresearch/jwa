@@ -82,8 +82,8 @@ class JWA {
    *
    * @return {Promise}
    */
-   static encrypt (alg, key, data, aad) {
-     // normalize the algorithm
+  static encrypt (alg, key, data, aad) {
+    // normalize the algorithm
     let normalizedAlgorithm = supportedAlgorithms.normalize('encrypt', alg)
 
     // validate algorithm is supported
@@ -111,8 +111,8 @@ class JWA {
    *
    * @return {Promise}
    */
-   static decrypt (alg, key, data, iv, tag, aad) {
-     // normalize the algorithm
+  static decrypt (alg, key, data, iv, tag, aad) {
+    // normalize the algorithm
     let normalizedAlgorithm = supportedAlgorithms.normalize('decrypt', alg)
 
     // validate algorithm is supported
@@ -125,25 +125,59 @@ class JWA {
   }
 
   /**
-   * wrapKey
+   * encryptKey
    *
    * @description
+   * Encrypt or wrap key using the specifed algorithm and the wrappingKey
    *
-   * @param {KeyFormat} format
+   * @param {string} alg
    * @param {CryptoKey} key
    * @param {CryptoKey} wrappingKey
-   * @param {AlgorithmIdentifier} wrapAlgorithm
    *
    * @returns {Promise}
    */
-  static wrapKey () {}
+  static encryptKey (alg, key, wrappingKey) {
+    // normalize the algorithm
+    let normalizedAlgorithm = supportedAlgorithms.normalize('encryptKey', alg)
+
+    // validate algorithm is supported
+    if (normalizedAlgorithm instanceof Error) {
+      return Promise.reject(new NotSupportedError(alg))
+    }
+
+    return normalizedAlgorithm.encryptKey(key, wrappingKey)
+  }
 
   /**
-   * unwrapKey
+   * decryptKey
+   *
+   * @description
+   * Decrypt or unwrap a wrappedKey
+   *
+   * @param {string} alg
+   * @param {string|Buffer} wrappedKey
+   * @param {CryptoKey} unwrappingKey
+   * @param {string} unwrappedKeyAlg
+   *
+   * @returns {Promise}
+   */
+  static decryptKey (alg, wrappedKey, unwrappingKey, unwrappedKeyAlg) {
+    // normalize the algorithm
+    let normalizedAlgorithm = supportedAlgorithms.normalize('decryptKey', alg)
+
+    // validate algorithm is supported
+    if (normalizedAlgorithm instanceof Error) {
+      return Promise.reject(new NotSupportedError(alg))
+    }
+
+    return normalizedAlgorithm.wrapKey(wrappedKey, unwrappingKey, unwrappedKeyAlg)
+  }
+
+  /**
+   * agreeKey
    *
    * @description
    *
-   * @param {KeyFormat} format
    * @param {BufferSource} wrappedKey
    * @param {CryptoKey} unwrappingKey
    * @param {AlgorithmIdentifier} unwrapAlgorithm
@@ -153,7 +187,17 @@ class JWA {
    *
    * @returns {Promise}
    */
-  static unwrapKey () {}
+  static agreeKey (unwrapAlg, wrappedKey, unwrappingKey, unwrappedKeyAlg) {
+    // normalize the algorithm
+    let normalizedAlgorithm = supportedAlgorithms.normalize('agreeKey', unwrapAlg)
+
+    // validate algorithm is supported
+    if (normalizedAlgorithm instanceof Error) {
+      return Promise.reject(new NotSupportedError(wrapAlg))
+    }
+
+    return normalizedAlgorithm.wrapKey(wrappedKey, unwrappingKey, unwrappedKeyAlg)
+  }
 
   /**
    * Generate Key
@@ -205,7 +249,7 @@ class JWA {
 
     return normalizedAlgorithm.importKey(key)
   }
-  
+
   /**
    * Export key
    *

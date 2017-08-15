@@ -90,7 +90,7 @@ class RSASSA_PKCS1_v1_5 {
     let algorithm = this.params
     let usages = key['key_ops'] || []
 
-    if (key.use === 'sig') {
+    if (key.use === 'sig' || !key.d) {
       usages.push('verify')
     }
 
@@ -113,6 +113,43 @@ class RSASSA_PKCS1_v1_5 {
 
         return jwk
       })
+
+      /* / construct the key operations array from key_ops and use fields
+      let usages = key['key_ops'] || []
+      // duplicate key operation values MUST NOT be present
+      if (!(usages.length === new Set(usages).size)) {
+        throw new Error('Invalid key operations key parameter')
+      }
+      // handle use parameter for public keys
+      if (key.use === 'sig') {
+        usages.push('verify')
+      }
+      if (key.use === 'enc') {
+        usages.push('encrypt')
+      }
+      // infer usages from kty
+      if (jwk.kty === 'EC') {
+        // Elliptic Curve is used
+        // if d parameter is present, this is a private key
+        if (jwk.d) {
+          usages.push('sign')
+        } else {
+          usages.push('verify')
+        }
+      } else if(jwk.kty === 'RSA') {
+        // RSA is used
+        if (jwk.d) {
+          if (!usages.includes('sign')) {
+            usages.push('sign')
+          }
+        } else if (!usages.includes('verify')) {
+          usages.push('verify')
+        }
+      } else if(jwk.kty === 'oct') {
+        // if it was none of the previous two store
+        // the JWA name from the alg field of the key
+        algorithm = key.alg
+      }*/
   }
 }
 

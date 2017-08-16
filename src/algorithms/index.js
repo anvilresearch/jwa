@@ -334,6 +334,30 @@ supportedAlgorithms.define('ES512', 'importKey', new ECDSA({
   }
 }))
 
+// supportedAlgorithms.define('A128CBC-HS256', 'importKey', {})
+
+// supportedAlgorithms.define('A192CBC-HS384', 'importKey', {})
+
+// supportedAlgorithms.define('A256CBC-HS512', 'importKey', {})
+
+ supportedAlgorithms.define('A128GCM', 'importKey', new AES_GCM({
+   name: 'AES-GCM',
+   length: 128,
+   tagLength: 128
+ }))
+
+ supportedAlgorithms.define('A192GCM', 'importKey', new AES_GCM({
+   name: 'AES-GCM',
+   length: 192,
+   tagLength: 128
+ }))
+
+ supportedAlgorithms.define('A256GCM', 'importKey', new AES_GCM({
+   name: 'AES-GCM',
+   length: 256,
+   tagLength: 128
+ }))
+
 /**
  * Export
  */

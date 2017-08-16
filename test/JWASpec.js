@@ -6,7 +6,6 @@
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const sinon = require('sinon')
-const supportedAlgorithms = require('../src/algorithms/SupportedAlgorithms')
 
 /**
  * Assertions
@@ -21,18 +20,28 @@ let expect = chai.expect
 const crypto = require('@trust/webcrypto')
 const { NotSupportedError } = require('../src/errors')
 const JWA = require('../src/JWA')
-const { RsaPrivateCryptoKey, RsaPublicCryptoKey, RsaPublicJwk } = require('./keys')
+const { RsaPrivateCryptoKey, RsaPublicCryptoKey,
+  RsaPublicJwk, RsaPrivateJwk } = require('./keys')
 
 /**
  * Tests
  */
 describe('JWA', () => {
   let alg, signature, data, enc, key
-  let A128GCMKey = {
+  let A256GCMKey = {
     kty: "oct",
     k: "Y0zt37HgOx-BY7SQjYVmrqhPkO44Ii2Jcb9yydUDPfE",
     alg: "A256GCM",
     ext: true,
+  }
+  let ECKey = {
+    "kty":"EC",
+    "crv":"P-256",
+    "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+    "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+    "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
+    "use":"enc",
+    "kid":"1"
   }
 
   before(() => {
@@ -48,7 +57,7 @@ describe('JWA', () => {
 
     crypto.subtle.importKey(
                   "jwk",
-                  A128GCMKey,
+                  A256GCMKey,
                   {   // algorithm
                     name: "AES-GCM",
                   },
@@ -81,7 +90,7 @@ describe('JWA', () => {
 
   describe('verify', () => {
     it('should return a promise', () => {
-      JWA.verify('RS256', RsaPublicCryptoKey, signature, data)
+      return JWA.verify('RS256', RsaPublicCryptoKey, signature, data)
         .should.be.fulfilled
     })
 
@@ -103,7 +112,7 @@ describe('JWA', () => {
 
   describe('encrypt', () => {
     it('should return a promise', () => {
-      JWA.encrypt('A128GCM', key, data)
+      return JWA.encrypt('A128GCM', key, data)
         .should.be.fulfilled
     })
 
@@ -136,7 +145,7 @@ describe('JWA', () => {
     })
 
     it('should return a promise', () => {
-      JWA.decrypt('A128GCM', key, result.ciphertext, result.iv, result.tag)
+      return JWA.decrypt('A128GCM', key, result.ciphertext, result.iv, result.tag)
         .should.be.fulfilled
     })
 
@@ -171,17 +180,30 @@ describe('JWA', () => {
   })
 
   describe('importKey', () => {
-    it('should call normalize once', function() {
-      var stub = sinon.stub(supportedAlgorithms, "normalize")
-      stub.onCall(0).returns(undefined)
-      RsaPublicJwk.alg = 'RS256'
-      return JWA.importKey(RsaPublicJwk)
+    it('should return a promise', () => {
+      return JWA.importKey(A256GCMKey).should.be.fulfilled
     })
 
     it('should resolve a public key', () => {
       RsaPublicJwk.alg = 'RS256'
-      return JWA.importKey(RsaPublicJwk)
-      .catch(console.log)
+      return JWA.importKey(RsaPublicJwk).should.be.fulfilled
+    })
+
+    it('should resolve a private key', () => {
+      RsaPrivateJwk.alg = 'RS256'
+      return JWA.importKey(RsaPrivateJwk).should.be.fulfilled
+    })
+
+    it('should accept same key with different algorithms', () => {
+      ECKey.alg = "ES256"
+      return Promise.resolve()
+      .then(() => {
+        return JWA.importKey(ECKey).should.be.fulfilled
+      })
+      .then(result => {
+        ECKey.alg = "ES384"
+        return JWA.importKey(A256GCMKey).should.be.fulfilled
+      })
     })
   })
 

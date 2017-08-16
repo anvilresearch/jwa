@@ -238,7 +238,7 @@ class JWA {
 
     // validate algorithm is supported
     if (normalizedAlgorithm instanceof Error) {
-      return Promise.reject(new NotSupportedError(alg))
+      return Promise.reject(new NotSupportedError(key.alg))
     }
 
     return normalizedAlgorithm.importKey(key)

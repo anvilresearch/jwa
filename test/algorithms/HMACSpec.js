@@ -123,5 +123,57 @@ describe('HMAC', () => {
 
     })
   })
-})
 
+  /**
+   * generateKey
+   */
+  describe('generateKey', () => {
+    let alg = { name: 'HMAC', hash: { name: 'SHA-256' } }
+
+    it('should return a promise', () => {
+      let hmac = new HMAC(alg)
+      hmac.generateKey(true, ["sign", "verify"]).should.be.instanceof(Promise)
+    })
+
+    it('should resolve a jwk', () => {
+      let hmac = new HMAC(alg)
+      return hmac.generateKey(true, ["sign", "verify"])
+        .then(result => {
+          result.algorithm.should.eql(hmac.params)
+        })
+
+    })
+  })
+
+  /**
+   * importKey
+   */
+  describe('importKey', () => {
+    let alg, hmacJwk, importedHmacKey, rawHmacKey
+
+    before(() => {
+      alg = { name: 'HMAC', hash: { name: 'SHA-256' } }
+
+      hmacJwk = {
+        "kty":"oct",
+        "k":`AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75
+           aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow`,
+        "key_ops": ["sign", "verify"]
+      }
+    })
+
+    it('should return a promise', () => {
+      let hmac = new HMAC(alg)
+      hmac.importKey(hmacJwk).should.be.instanceof(Promise)
+    })
+
+    it('should resolve a JWK import', () => {
+      let hmac = new HMAC(alg)
+      return hmac.importKey(hmacJwk)
+        .then(imported => {
+          imported.cryptoKey.constructor.name.should.equal('CryptoKey')
+        })
+
+    })
+  })
+})

@@ -76,7 +76,8 @@ class ECDSA {
    * @description
    * Generate key pair for ECDSA.
    *
-   * @param {string} alg
+   * @param {boolean} extractable
+   * @param {Array} key_ops
    * @param {Object} options
    *
    * @return {Promise}

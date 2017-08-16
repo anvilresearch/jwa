@@ -74,6 +74,52 @@ class HMAC {
   }
 
   /**
+   * Generate Key
+   *
+   * @description
+   * Generate key for HMAC.
+   *
+   * @param {boolean} extractable
+   * @param {Array} key_ops
+   * @param {Object} options
+   *
+   * @return {Promise}
+   */
+  generateKey (extractable, key_ops, options = {}) {
+    let params = this.params
+    return crypto.subtle
+      .generateKey(params, extractable, key_ops)
+  }
+
+
+  /**
+   * importKey
+   *
+   * @param {JWK} key
+   * @returns {Promise}
+   */
+  importKey (key) {
+    let jwk = Object.assign({}, key)
+    let algorithm = this.params
+    let usages = key['key_ops'] || []
+    // duplicate key operation values MUST NOT be present
+    if (!(usages.length === new Set(usages).size)) {
+      throw new Error('Invalid key operations key parameter')
+    }
+
+    return crypto.subtle
+      .importKey('jwk', jwk, algorithm, true, usages)
+      .then(cryptoKey => {
+        Object.defineProperty(jwk, 'cryptoKey', {
+          enumerable: false,
+          value: cryptoKey
+        })
+
+        return jwk
+      })
+  }
+
+  /**
    * Assert Sufficient Key Length
    *
    * @description Assert that the key length is sufficient

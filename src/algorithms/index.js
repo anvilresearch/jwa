@@ -299,6 +299,27 @@ supportedAlgorithms.define('A256GCM', 'generateKey', new AES_GCM({
   tagLength: 128
 }))
 
+supportedAlgorithms.define('HS256', 'generateKey', new HMAC({
+  name: 'HMAC',
+  hash: {
+    name: 'SHA-256'
+  }
+}))
+
+supportedAlgorithms.define('HS384', 'generateKey', new HMAC({
+  name: 'HMAC',
+  hash: {
+    name: 'SHA-384'
+  }
+}))
+
+supportedAlgorithms.define('HS512', 'generateKey', new HMAC({
+  name: 'HMAC',
+  hash: {
+    name: 'SHA-512'
+  }
+}))
+
 supportedAlgorithms.define('KS256', 'generateKey', new ECDSA({
   name: 'ECDSA',
   namedCurve: 'K-256',
@@ -350,6 +371,27 @@ supportedAlgorithms.define('RS384', 'importKey', new RSASSA_PKCS1_v1_5({
 
 supportedAlgorithms.define('RS512', 'importKey', new RSASSA_PKCS1_v1_5({
   name: 'RSASSA-PKCS1-v1_5',
+  hash: {
+    name: 'SHA-512'
+  }
+}))
+
+supportedAlgorithms.define('HS256', 'importKey', new HMAC({
+  name: 'HMAC',
+  hash: {
+    name: 'SHA-256'
+  }
+}))
+
+supportedAlgorithms.define('HS384', 'importKey', new HMAC({
+  name: 'HMAC',
+  hash: {
+    name: 'SHA-384'
+  }
+}))
+
+supportedAlgorithms.define('HS512', 'importKey', new HMAC({
+  name: 'HMAC',
   hash: {
     name: 'SHA-512'
   }

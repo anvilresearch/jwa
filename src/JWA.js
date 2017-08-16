@@ -6,7 +6,7 @@
  */
 const base64url = require('base64url')
 const supportedAlgorithms = require('./algorithms')
-const { NotSupportedError } = require('./errors')
+const { NotSupportedError, DataError } = require('./errors')
 const crypto = require('@trust/webcrypto')
 
 /**
@@ -74,7 +74,7 @@ class JWA {
    *
    * @param {string} alg
    * @param {CryptoKey} key
-   * @param {string\Buffer} data
+   * @param {string|Buffer} data
    * @param {string|Buffer} aad
    *
    * @return {Promise}

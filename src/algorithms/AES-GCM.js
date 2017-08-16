@@ -26,18 +26,27 @@ class AES_GCM {
    * encrypt
    *
    * @description
-   * .
+   * Encrypt data and associated additional authentication data using AES-GCM.
    *
    * @param {CryptoKey} key
    * @param {BufferSource} data
+   * @param {BufferSource} aad
    *
    * @returns {Promise}
    */
   encrypt (key, data, aad) {
     let algorithm = Object.assign({}, this.params)
     // ensure each encryption has a new iv
-    algorithm.iv = crypto.getRandomValues(new Uint8Array(16))
-    algorithm.additionalData = aad
+    Object.defineProperty(algorithm, 'iv', {
+      enumerable: false,
+      configurable: true,
+      value: crypto.getRandomValues(new Uint8Array(16))
+    })
+    Object.defineProperty(algorithm, 'aad', {
+      enumerable: false,
+      configurable: true,
+      value: aad
+    })
 
     data = new TextEncoder().encode(data)
 
@@ -65,7 +74,7 @@ class AES_GCM {
    * checking for integrity using the tag provided.
    *
    * @param {CryptoKey} key
-   * @param {string} data
+   * @param {string} ciphertext
    * @param {string} iv
    * @param {string} tag
    * @param {string} aad
@@ -74,8 +83,16 @@ class AES_GCM {
    */
   decrypt (key, ciphertext, iv, tag, aad) {
     let algorithm = this.params
-    algorithm.iv = Uint8Array.from(base64url.toBuffer(iv))
-    algorithm.additionalData = aad
+    Object.defineProperty(algorithm, 'iv', {
+      enumerable: false,
+      configurable: true,
+      value: Uint8Array.from(base64url.toBuffer(iv))
+    })
+    Object.defineProperty(algorithm, 'aad', {
+      enumerable: false,
+      configurable: true,
+      value: aad
+    })
 
     // Decode ciphertext and tag from base64
     ciphertext = base64url.toBuffer(ciphertext)
@@ -105,8 +122,9 @@ class AES_GCM {
    */
   encryptKey (key, wrappingKey) {
     let algorithm = this.params
-    return crypto.subtle
-      .wrapKey('jwk', key, wrappingKey, algorithm)
+    return Promise.resolve()
+    // return crypto.subtle
+      // .wrapKey('jwk', key, wrappingKey, algorithm)
   }
 
   /**
@@ -122,7 +140,8 @@ class AES_GCM {
    * @returns {Promise}
    */
   decryptKey (wrappedKey, unwrappingKey, unwrappedKeyAlg) {
-    // let algorithm = this.params
+    let algorithm = this.params
+    return Promise.resolve()
     // return crypto.subtle
       // .unwrapKey('jwk', wrappedKey, unwrappingKey, algorithm, unwrappedKeyAlgorithm, true, keyUsages)
   }
@@ -159,8 +178,6 @@ class AES_GCM {
   importKey (key) {
     let jwk = Object.assign({}, key)
     let algorithm = this.params
-    // usages are specified by the key_ops field ONLY in this case
-    // empty usages breaks the api
     let usages = key['key_ops'] || ['encrypt', 'decrypt']
 
     return crypto.subtle

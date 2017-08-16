@@ -17,12 +17,6 @@ let expect = chai.expect
 const crypto = require('@trust/webcrypto')
 const base64url = require('base64url')
 const AES_GCM = require('../../src/algorithms/AES-GCM')
-const A128GCMKey = {
-  kty: "oct",
-  k: "Y0zt37HgOx-BY7SQjYVmrqhPkO44Ii2Jcb9yydUDPfE",
-  alg: "A256GCM",
-  ext: true,
-}
 
 /**
  * Tests
@@ -30,6 +24,12 @@ const A128GCMKey = {
 describe('AES-GCM', () => {
 
   let alg, ec, encryptedData
+  const A256GCMKey = {
+    kty: "oct",
+    k: "Y0zt37HgOx-BY7SQjYVmrqhPkO44Ii2Jcb9yydUDPfE",
+    alg: "A256GCM",
+    ext: true,
+  }
 
   before(() => {
     alg = { name: 'AES-GCM', length: 128, tagLength: 128 }
@@ -54,12 +54,7 @@ describe('AES-GCM', () => {
     before(() => {
       let promise = crypto.subtle.importKey(
                     "jwk",
-                    {
-                      kty: "oct",
-                      k: "Y0zt37HgOx-BY7SQjYVmrqhPkO44Ii2Jcb9yydUDPfE",
-                      alg: "A256GCM",
-                      ext: true,
-                    },
+                    A256GCMKey,
                     {   // algorithm
                       name: "AES-GCM",
                     },
@@ -67,7 +62,9 @@ describe('AES-GCM', () => {
                     ["encrypt", "decrypt"] // usages
                   )
       data = 'encrypted with Chrome webcrypto'
-      promise.then(result => { key = result })
+      promise.then(result => {
+        key = result
+      })
     })
 
     it('should return a promise', () => {
@@ -101,7 +98,7 @@ describe('AES-GCM', () => {
     before(() => {
       let promise = crypto.subtle.importKey(
                    "jwk",
-                   A128GCMKey,
+                   A256GCMKey,
                    {   // algorithm
                      name: "AES-GCM",
                    },
@@ -131,14 +128,38 @@ describe('AES-GCM', () => {
   /**
    * encryptKey
    */
+  describe('encryptKey', () => {
+
+  })
 
   /**
    * decryptKey
    */
+  describe('decryptKey', () => {
+
+  })
 
   /**
    * generateKey
    */
+  describe('generateKey', () => {
+    let promise, result
+
+    before(() => {
+      promise = ec.generateKey(true, ["encrypt", "decrypt"])
+      promise.then(jwk => {
+        result = jwk
+      })
+    })
+
+    it('should return a promise', () => {
+      promise.should.be.instanceof(Promise)
+    })
+
+    it('should create a CryptoKey', () => {
+      result.algorithm.should.eql(ec.params)
+    })
+  })
 
   /**
    * importKey
@@ -147,7 +168,7 @@ describe('AES-GCM', () => {
     let promise, result
 
     before(() => {
-      promise = ec.importKey(A128GCMKey).then(jwk => result = jwk)
+      promise = ec.importKey(A256GCMKey).then(jwk => result = jwk)
     })
 
     it('should return a promise', () => {
@@ -155,7 +176,7 @@ describe('AES-GCM', () => {
     })
 
     it('should resolve a JWK', () => {
-      result.should.eql(A128GCMKey)
+      result.should.eql(A256GCMKey)
     })
 
     it('should resolve a JWK with CryptoKey property', () => {

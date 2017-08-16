@@ -287,6 +287,18 @@ supportedAlgorithms.define('A128GCM', 'generateKey', new AES_GCM({
   tagLength: 128
 }))
 
+supportedAlgorithms.define('A192GCM', 'generateKey', new AES_GCM({
+  name: 'AES-GCM',
+  length: 192,
+  tagLength: 128
+}))
+
+supportedAlgorithms.define('A256GCM', 'generateKey', new AES_GCM({
+  name: 'AES-GCM',
+  length: 256,
+  tagLength: 128
+}))
+
 supportedAlgorithms.define('KS256', 'generateKey', new ECDSA({
   name: 'ECDSA',
   namedCurve: 'K-256',

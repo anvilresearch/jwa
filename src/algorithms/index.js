@@ -299,6 +299,27 @@ supportedAlgorithms.define('A256GCM', 'generateKey', new AES_GCM({
   tagLength: 128
 }))
 
+supportedAlgorithms.define('RS256', 'generateKey', new RSASSA_PKCS1_v1_5({
+  name: 'RSASSA-PKCS1-v1_5',
+  hash: {
+    name: 'SHA-256'
+  }
+}))
+
+supportedAlgorithms.define('RS384', 'generateKey', new RSASSA_PKCS1_v1_5({
+  name: 'RSASSA-PKCS1-v1_5',
+  hash: {
+    name: 'SHA-384'
+  }
+}))
+
+supportedAlgorithms.define('RS512', 'generateKey', new RSASSA_PKCS1_v1_5({
+  name: 'RSASSA-PKCS1-v1_5',
+  hash: {
+    name: 'SHA-512'
+  }
+}))
+
 supportedAlgorithms.define('HS256', 'generateKey', new HMAC({
   name: 'HMAC',
   hash: {

@@ -34,15 +34,6 @@ describe('JWA', () => {
     alg: "A256GCM",
     ext: true,
   }
-  let ECKey = {
-    "kty":"EC",
-    "crv":"P-256",
-    "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
-    "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
-    "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
-    "use":"enc",
-    "kid":"1"
-  }
 
   before(() => {
     alg = { name: 'RSASSA-PKCS1-v1_5' }
@@ -210,14 +201,14 @@ describe('JWA', () => {
     })
 
     it('should accept same key with different algorithms', () => {
-      ECKey.alg = "ES256"
+      RsaPublicJwk.alg = "RS256"
       return Promise.resolve()
       .then(() => {
-        return JWA.importKey(ECKey).should.be.fulfilled
+        return JWA.importKey(RsaPublicJwk).should.be.fulfilled
       })
       .then(result => {
-        ECKey.alg = "ES384"
-        return JWA.importKey(A256GCMKey).should.be.fulfilled
+        RsaPublicJwk.alg = "RS384"
+        return JWA.importKey(RsaPublicJwk).should.be.fulfilled
       })
     })
   })

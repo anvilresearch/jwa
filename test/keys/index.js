@@ -92,6 +92,30 @@ const RsaPublicCryptoKey = new CryptoKey({
   handle: RsaPublicKey
 })
 
+/*
+ * ECPrivateJwk
+ */
+const ECPrivateJwk = {
+  "kty":"EC",
+  "crv":"P-256",
+  "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+  "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+  "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
+  "kid":"1"
+}
+
+/*
+ * ECPublicJwk
+ */
+const ECPublicJwk = {
+  "kty":"EC",
+  "crv":"P-256",
+  "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+  "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+  "use":"sig",
+  "kid":"1"
+}
+
 /**
  * Export
  */
@@ -101,11 +125,7 @@ module.exports = {
   RsaPrivateCryptoKey,
   RsaPublicKey,
   RsaPublicJwk,
-  RsaPublicCryptoKey
+  RsaPublicCryptoKey,
+  ECPrivateJwk,
+  ECPublicJwk
 }
-
-
-
-
-
-

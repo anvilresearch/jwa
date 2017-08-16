@@ -126,6 +126,7 @@ TBD
 * Christian Smith [@christiansmith](https://github.com/christiansmith)
 * Greg Linklater [@EternalDeiwos](https://github.com/EternalDeiwos)
 * Dmitri Zagidulin [@dmitrizagidulin](https://github.com/dmitrizagidulin)
+* Ioan Budea [@johnny90](https://github.com/johnny90)
 
 ## MIT License
 

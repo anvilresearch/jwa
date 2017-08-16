@@ -177,11 +177,26 @@ describe('JWA', () => {
   })
 
   describe('generateKey', () => {
+    it('should return a promise', () => {
+      return JWA.generateKey("A128GCM", {key_ops: ["encrypt", "decrypt"]})
+        .should.be.fulfilled
+    })
+
+    it('should reject unsupported algorithm', () => {
+      return JWA.generateKey("A257GCM", {key_ops: ["encrypt", "decrypt"]})
+        .should.be.rejectedWith(NotSupportedError)
+    })
   })
 
   describe('importKey', () => {
     it('should return a promise', () => {
       return JWA.importKey(A256GCMKey).should.be.fulfilled
+    })
+
+    it('should reject unsupported algorithm', () => {
+      key.alg = 'RS257'
+      return JWA.importKey(key)
+        .should.be.rejectedWith(NotSupportedError)
     })
 
     it('should resolve a public key', () => {

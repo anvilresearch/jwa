@@ -61,20 +61,20 @@ class AES_GCM {
    * decrypt
    *
    * @description
-   * .
+   * Decrypt the given data (authenticated with the aad) encrypted with iv,
+   * checking for integrity using the tag provided.
    *
    * @param {CryptoKey} key
-   * @param {BufferSource} data
-   * @param {BufferSource} iv
+   * @param {string} data
+   * @param {string} iv
+   * @param {string} tag
+   * @param {string} aad
    *
-   * @returns {Promise}
+   * @return {Promise}
    */
   decrypt (key, ciphertext, iv, tag, aad) {
-
     let algorithm = this.params
-
     algorithm.iv = Uint8Array.from(base64url.toBuffer(iv))
-
     algorithm.additionalData = aad
 
     // Decode ciphertext and tag from base64
@@ -93,10 +93,68 @@ class AES_GCM {
   }
 
   /**
-   * importKey
+   * encryptKey
    *
-   * @param {JWK} key
+   * @description
+   * Wrap key using AES-GCM.
+   *
+   * @param {CryptoKey} key
+   * @param {CryptoKey} wrappingKey
+   *
    * @returns {Promise}
+   */
+  encryptKey (key, wrappingKey) {
+    let algorithm = this.params
+    return crypto.subtle
+      .wrapKey('jwk', key, wrappingKey, algorithm)
+  }
+
+  /**
+   * decryptKey
+   *
+   * @description
+   * Unwrap key using AES-GCM.
+   *
+   * @param {string|Buffer} wrappedKey
+   * @param {CryptoKey} unwrappingKey
+   * @param {string} unwrappedKeyAlg
+   *
+   * @returns {Promise}
+   */
+  decryptKey (wrappedKey, unwrappingKey, unwrappedKeyAlg) {
+    // let algorithm = this.params
+    // return crypto.subtle
+      // .unwrapKey('jwk', wrappedKey, unwrappingKey, algorithm, unwrappedKeyAlgorithm, true, keyUsages)
+  }
+
+
+  /**
+   * Generate Key
+   *
+   * @description
+   * Generate key for AES-GCM.
+   *
+   * @param {boolean} extractable
+   * @param {Array} key_ops
+   * @param {Object} options
+   *
+   * @return {Promise}
+   */
+  generateKey (extractable, key_ops, options = {}) {
+    let algorithm = this.params
+    return crypto.subtle
+      .generateKey(algorithm, extractable, key_ops)
+  }
+
+  /**
+   * Import
+   *
+   * @description
+   * Import a key in JWK format.
+   *
+   * @param {CryptoKey} key
+   *
+   * @return {Promise}
    */
   importKey (key) {
     let jwk = Object.assign({}, key)

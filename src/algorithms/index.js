@@ -279,6 +279,15 @@ supportedAlgorithms.define('none', 'verify', {})
 // supportedAlgorithms.define('ECDH-ES+A256KW', 'agreeKey', {})
 
 /**
+ * generateKey
+ */
+supportedAlgorithms.define('A128GCM', 'generateKey', new AES_GCM({
+  name: 'AES-GCM',
+  length: 128,
+  tagLength: 128
+}))
+
+/**
  * importKey
  */
 supportedAlgorithms.define('RS256', 'importKey', new RSASSA_PKCS1_v1_5({

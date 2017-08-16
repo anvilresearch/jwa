@@ -215,7 +215,7 @@ class JWA {
 
     let { key_ops, extractable = true } = options
 
-    if (!key_ops) {
+    if (!key_ops || !Array.isArray(key_ops)) {
       return Promise.reject(new DataError('Invalid key_ops'))
     }
 

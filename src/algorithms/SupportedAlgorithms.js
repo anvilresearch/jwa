@@ -11,6 +11,7 @@ const operations = [
   'verify',
   'encrypt',
   'decrypt',
+  'generateKey',
   'importKey'
 ]
 

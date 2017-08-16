@@ -80,6 +80,28 @@ class RSASSA_PKCS1_v1_5 {
   }
 
   /**
+   * Generate Key
+   *
+   * @description
+   * Generate key pair for RSA.
+   *
+   * @param {boolean} extractable
+   * @param {Array} key_ops
+   * @param {Object} options
+   *
+   * @return {Promise}
+   */
+  generateKey (extractable, key_ops, options = {}) {
+    let params = this.params
+    let { modulusLength } = options
+    if (modulusLength) {
+      params.modulusLength = modulusLength
+    }
+    return crypto.subtle
+      .generateKey(params, extractable, key_ops)
+  }
+
+  /**
    * importKey
    *
    * @param {JWK} key
@@ -89,18 +111,24 @@ class RSASSA_PKCS1_v1_5 {
     let jwk = Object.assign({}, key)
     let algorithm = this.params
     let usages = key['key_ops'] || []
-
-    if (key.use === 'sig') {
+    // duplicate key operation values MUST NOT be present
+    if (!(usages.length === new Set(usages).size)) {
+      throw new Error('Invalid key operations key parameter')
+    }
+    if (key.use === 'sig' || !key.d) {
       usages.push('verify')
     }
-
     if (key.use === 'enc') {
-      // TODO: handle encryption keys
-      return Promise.resolve(key)
+      return Promise.reject(new Error('Invalid use key parameter'))
     }
-
-    if (key.key_ops) {
-      usages = key.key_ops
+    // RSA is used
+    // if d parameter is present, this is a private key
+    if (jwk.d) {
+      if (!usages.includes('sign')) {
+        usages.push('sign')
+      }
+    } else if (!usages.includes('verify')) {
+      usages.push('verify')
     }
 
     return crypto.subtle

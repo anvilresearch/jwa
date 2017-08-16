@@ -17,7 +17,7 @@ let expect = chai.expect
 const crypto = require('@trust/webcrypto')
 const base64url = require('base64url')
 const RSASSA_PKCS1_v1_5 = require('../../src/algorithms/RSASSA-PKCS1-v1_5')
-const {RsaPrivateCryptoKey, RsaPublicCryptoKey, RsaPrivateJwk} = require('../keys')
+const { RsaPrivateCryptoKey, RsaPublicCryptoKey, RsaPrivateJwk, RsaPublicJwk } = require('../keys')
 
 /**
  * Tests
@@ -70,14 +70,12 @@ describe('RSASSA_PKCS1_v1_5', () => {
     })
 
     it('should return a promise', () => {
-      let rsa = new RSASSA_PKCS1_v1_5(alg)
       rsa.sign(RsaPrivateCryptoKey, data).should.be.instanceof(Promise)
     })
 
     it('should reject an insufficient key length')
 
     it('should resolve a base64url encoded value', () => {
-      let rsa = new RSASSA_PKCS1_v1_5(alg)
       return rsa.sign(RsaPrivateCryptoKey, data)
         .then(signature => {
           base64url.toBuffer(signature)
@@ -99,17 +97,21 @@ describe('RSASSA_PKCS1_v1_5', () => {
 
       data ='signed with Chrome webcrypto'
 
-      signature = 'VLW6eetMx2aufbDYXr7zydty4z02wu0O-Mx4bfnc5VAsMFaFYIFV1UYTfgCgWxK5yGa0tUUborW9brxwfF050FuOtsBXp8FvWAX0bMiWhUSQ0Bub3tW94JzifEGyRUc_840DftHtLbPw_8L1K5R7YazvqN0sukjCHQmrZ322J1-jUAPQuLgwcocHb3ImGRzqUhIxcRT7O5POB4YPvcn98XjsOuuUG8zppR8b3xwK1p9tuu9HfhI_b8Zz4u2RGgx4OKYNw0ELcpWR__Jhvv_K25BT7vC2UqXldpIdX39MvPeK_kgS-yp2nOVCCGo3alPo6hfDoKeFDrV-BSSdAlGQUw'
+      signature = 'VLW6eetMx2aufbDYXr7zydty4z02wu0O-Mx4bfnc5VAsMFaFYIFV1UY' +
+                  'TfgCgWxK5yGa0tUUborW9brxwfF050FuOtsBXp8FvWAX0bMiWhUSQ0B' +
+                  'ub3tW94JzifEGyRUc_840DftHtLbPw_8L1K5R7YazvqN0sukjCHQmrZ' +
+                  '322J1-jUAPQuLgwcocHb3ImGRzqUhIxcRT7O5POB4YPvcn98XjsOuuU' +
+                  'G8zppR8b3xwK1p9tuu9HfhI_b8Zz4u2RGgx4OKYNw0ELcpWR__Jhvv_' +
+                  'K25BT7vC2UqXldpIdX39MvPeK_kgS-yp2nOVCCGo3alPo6hfDoKeFDr' +
+                  'V-BSSdAlGQUw'
     })
 
     it('should return a promise', () => {
-      let rsa = new RSASSA_PKCS1_v1_5(alg)
       rsa.verify(RsaPublicCryptoKey, signature, data)
         .should.be.instanceof(Promise)
     })
 
     it('should resolve a boolean', () => {
-      let rsa = new RSASSA_PKCS1_v1_5(alg)
       return rsa.verify(RsaPublicCryptoKey, signature, data)
         .then(verified => {
           verified.should.equal(true)
@@ -118,28 +120,73 @@ describe('RSASSA_PKCS1_v1_5', () => {
   })
 
   /**
-   * importKey
+   * generateKey
    */
-  describe('importKey', () => {
-    let promise, result
+  describe('generateKey', () => {
+    let promise, result, alg, rsa
 
     before(() => {
-      let alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: 'SHA-256' } }
-      let rsa = new RSASSA_PKCS1_v1_5(alg)
-      promise = rsa.importKey(RsaPrivateJwk).then(jwk => result = jwk)
+      alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: 'SHA-256' } }
+
+      rsa = new RSASSA_PKCS1_v1_5(alg)
+
+      promise = rsa.generateKey(true, ["sign"])
+      promise.then(jwk => {
+        result = jwk
+      })
     })
 
     it('should return a promise', () => {
       promise.should.be.instanceof(Promise)
     })
 
+    it('should create a CryptoKeyPair', () => {
+      result.should.have.property('publicKey')
+      result.should.have.property('privateKey')
+      result.publicKey.algorithm.should.eql(alg)
+      result.privateKey.algorithm.should.eql(alg)
+    })
+  })
+
+  /**
+   * importKey
+   */
+  describe('importKey', () => {
+    let publicPromise, privatePromise, publicResult, privateResult, alg, rsa
+    before(() => {
+      alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: 'SHA-256' } }
+
+      rsa = new RSASSA_PKCS1_v1_5(alg)
+
+      publicPromise = rsa.importKey(RsaPublicJwk)
+      publicPromise.then(jwk => {
+        publicResult = jwk
+      })
+      privatePromise = rsa.importKey(RsaPrivateJwk)
+      privatePromise.then(jwk => {
+        privateResult = jwk
+      })
+    })
+
+    it('should return a promise', () => {
+      privatePromise.should.be.instanceof(Promise)
+      publicPromise.should.be.instanceof(Promise)
+    })
+
+    it('should reject "enc" use', () => {
+      let wrongKey = Object.assign({}, RsaPublicJwk)
+      wrongKey.use = "enc"
+      return rsa.importKey(wrongKey).should.be.rejectedWith(Error)
+    })
+
     it('should resolve a JWK', () => {
-      result.should.eql(RsaPrivateJwk)
+      privateResult.should.eql(RsaPrivateJwk)
+      publicResult.should.eql(RsaPublicJwk)
     })
 
     it('should resolve a JWK with CryptoKey property', () => {
-      result.cryptoKey.constructor.name.should.equal('CryptoKey')
+      privateResult.cryptoKey.constructor.name.should.equal('CryptoKey')
+      publicResult.cryptoKey.constructor.name.should.equal('CryptoKey')
     })
   })
 })
-

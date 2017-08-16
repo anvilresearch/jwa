@@ -65,10 +65,29 @@ class ECDSA {
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }
-    // ...
 
-    return crypto.subtle.verify(algorithm, key, signature, data)
+    return crypto.subtle
+      .verify(algorithm, key, signature, data)
   }
+
+  /**
+   * Generate Key
+   *
+   * @description
+   * Generate key pair for ECDSA.
+   *
+   * @param {boolean} extractable
+   * @param {Array} key_ops
+   * @param {Object} options
+   *
+   * @return {Promise}
+   */
+  generateKey (extractable, key_ops, options = {}) {
+    let params = this.params
+    return crypto.subtle
+      .generateKey(params, extractable, key_ops)
+  }
+
 
   /**
    * importKey
@@ -80,18 +99,24 @@ class ECDSA {
     let jwk = Object.assign({}, key)
     let algorithm = this.params
     let usages = key['key_ops'] || []
-
+    // duplicate key operation values MUST NOT be present
+    if (!(usages.length === new Set(usages).size)) {
+      throw new Error('Invalid key operations key parameter')
+    }
+    // handle use parameter for public keys
     if (key.use === 'sig') {
       usages.push('verify')
     }
-
     if (key.use === 'enc') {
-      // TODO: handle encryption keys
-      return Promise.resolve(key)
+      return Promise.reject(new Error('Invalid use key parameter'))
     }
 
-    if (key.key_ops) {
-      usages = key.key_ops
+    // Elliptic Curve is used
+    // if d parameter is present, this is a private key
+    if (jwk.d) {
+      usages.push('sign')
+    } else {
+      usages.push('verify')
     }
 
     return crypto.subtle

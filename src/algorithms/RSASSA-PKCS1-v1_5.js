@@ -115,7 +115,7 @@ class RSASSA_PKCS1_v1_5 {
     if (!(usages.length === new Set(usages).size)) {
       throw new Error('Invalid key operations key parameter')
     }
-    if (key.use === 'sig' || !key.d) {
+    if (!usages.includes('verify') && (key.use === 'sig' || !key.d)) {
       usages.push('verify')
     }
     if (key.use === 'enc') {

@@ -114,8 +114,10 @@ class ECDSA {
     // Elliptic Curve is used
     // if d parameter is present, this is a private key
     if (jwk.d) {
-      usages.push('sign')
-    } else {
+      if (!usages.includes('sign')) {
+        usages.push('sign')
+      }
+    } else if (!usages.includes('verify')) {
       usages.push('verify')
     }
 

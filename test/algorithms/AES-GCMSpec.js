@@ -29,13 +29,19 @@ const encryptedWithAad = {
   ciphertext: base64url(Buffer.from([219,150,7,111,57,171,225,186,91,234,198,237,236,103,238,65,139,236,225,39,29,81,221,32,99,53,244,187,49,202,30])),
   iv: base64url(Buffer.from([89,209,108,248,129,144,123,205,136,161,187,142,128,11,17,154])),
 }
+const encryptedWithoutAad = {
+  data: 'encrypted with Chrome webcrypto',
+  tag: base64url(Buffer.from([195,62,147,6,74,41,247,155,159,147,64,182,114,1,221,124])),
+  ciphertext: base64url(Buffer.from([219,150,7,111,57,171,225,186,91,234,198,237,236,103,238,65,139,236,225,39,29,81,221,32,99,53,244,187,49,202,30])),
+  iv: base64url(Buffer.from([89,209,108,248,129,144,123,205,136,161,187,142,128,11,17,154])),
+}
 
 /**
  * Tests
  */
 describe('AES-GCM', () => {
 
-  let alg, ec, encryptedData
+  let alg, ec
   const A256GCMKey = {
     kty: "oct",
     k: "Y0zt37HgOx-BY7SQjYVmrqhPkO44Ii2Jcb9yydUDPfE",
@@ -87,7 +93,6 @@ describe('AES-GCM', () => {
     it('should perform encryption', () => {
       return ec.encrypt(key, data)
         .then(result => {
-          encryptedData = result
           result.should.not.eql(Buffer.from(data))
         })
     })
@@ -136,16 +141,16 @@ describe('AES-GCM', () => {
     })
 
     it('should return a promise', () => {
-      ec.decrypt(key, encryptedData.ciphertext,
-        encryptedData.iv, encryptedData.tag)
+      ec.decrypt(key, encryptedWithoutAad.ciphertext,
+        encryptedWithoutAad.iv, encryptedWithoutAad.tag)
       .should.be.instanceof(Promise)
     })
 
     it('should recover plaintext', () => {
-      return ec.decrypt(key, encryptedData.ciphertext,
-        encryptedData.iv, encryptedData.tag)
+      return ec.decrypt(key, encryptedWithoutAad.ciphertext,
+        encryptedWithoutAad.iv, encryptedWithoutAad.tag)
         .then(result => {
-          result.should.eql(data)
+          result.should.eql(encryptedWithoutAad.data)
         })
     })
 

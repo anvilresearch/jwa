@@ -65,7 +65,8 @@ class AES_GCM {
           iv: base64url(Buffer.from(algorithm.iv)),
           ciphertext: base64url(Buffer.from(ciphertext)),
           tag: base64url(Buffer.from(tag))
-        }, algorithm.additionalData.length > 0
+        },
+        algorithm.additionalData && algorithm.additionalData.length > 0
           ? { aad: base64url(Buffer.from(algorithm.additionalData)) }
           : {}
         )

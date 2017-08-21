@@ -84,7 +84,7 @@ class AES_GCM {
    * @param {string} ciphertext - Base64URL encoded cipher text.
    * @param {string} iv - Base64URL encoded intialization vector.
    * @param {string} tag - Base64URL encoded authentication tag.
-   * @param {string} aad - Base64URL encoded addtional authenticated data.
+   * @param {string} [aad] - Base64URL encoded addtional authenticated data.
    *
    * @return {Promise}
    */

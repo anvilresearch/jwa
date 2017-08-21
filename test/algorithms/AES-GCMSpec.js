@@ -4,6 +4,7 @@
  * Test dependencies
  */
 const chai = require('chai')
+const TextEncoder = require('../../src/text-encoder')
 
 /**
  * Assertions
@@ -17,6 +18,17 @@ let expect = chai.expect
 const crypto = require('@trust/webcrypto')
 const base64url = require('base64url')
 const AES_GCM = require('../../src/algorithms/AES-GCM')
+
+/**
+ * Test Data from browser
+ */
+const encryptedWithAad = {
+  data: 'encrypted with Chrome webcrypto',
+  aad: base64url(new TextEncoder().encode('additional metadata')),
+  tag: base64url(Buffer.from([183,165,187,15,18,138,110,42,90,65,41,68,144,168,192,211])),
+  ciphertext: base64url(Buffer.from([219,150,7,111,57,171,225,186,91,234,198,237,236,103,238,65,139,236,225,39,29,81,221,32,99,53,244,187,49,202,30])),
+  iv: base64url(Buffer.from([89,209,108,248,129,144,123,205,136,161,187,142,128,11,17,154])),
+}
 
 /**
  * Tests
@@ -49,7 +61,7 @@ describe('AES-GCM', () => {
    * encrypt
    */
   describe('encrypt', () => {
-    let data, key
+    let data, key, aad
 
     before(() => {
       let promise = crypto.subtle.importKey(
@@ -62,6 +74,7 @@ describe('AES-GCM', () => {
                     ["encrypt", "decrypt"] // usages
                   )
       data = 'encrypted with Chrome webcrypto'
+      aad = 'additional metadata'
       promise.then(result => {
         key = result
       })
@@ -85,6 +98,19 @@ describe('AES-GCM', () => {
           result.should.have.property('ciphertext')
           result.should.have.property('iv')
           result.should.have.property('tag')
+          result.should.not.have.property('aad')
+        })
+    })
+
+    describe('with aad', () => {
+      it('should encrypt with aad', () => {
+        return ec.encrypt(key, data, aad)
+          .then(result => {
+            result.should.have.property('ciphertext')
+            result.should.have.property('iv')
+            result.should.have.property('tag')
+            result.should.have.property('aad')
+          })
       })
     })
   })
@@ -123,6 +149,13 @@ describe('AES-GCM', () => {
         })
     })
 
+    describe('with aad', () => {
+      it('should decrypt with aad', () => {
+        return ec.decrypt(key, encryptedWithAad.ciphertext,
+          encryptedWithAad.iv, encryptedWithAad.tag, encryptedWithAad.aad)
+          .should.eventually.equal(data)
+      })
+    })
   })
 
   /**

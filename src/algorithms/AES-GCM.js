@@ -29,8 +29,8 @@ class AES_GCM {
    * Encrypt data and associated additional authentication data using AES-GCM.
    *
    * @param {CryptoKey} key
-   * @param {BufferSource} data
-   * @param {BufferSource} aad
+   * @param {(BufferSource|String)} data
+   * @param {(BufferSource|String)} aad
    *
    * @returns {Promise}
    */
@@ -42,13 +42,16 @@ class AES_GCM {
       configurable: true,
       value: crypto.getRandomValues(new Uint8Array(16))
     })
-    Object.defineProperty(algorithm, 'aad', {
+    Object.defineProperty(algorithm, 'additionalData', {
       enumerable: false,
       configurable: true,
-      value: aad
+      value: typeof aad === 'string' ? new TextEncoder().encode(aad) : aad
     })
 
-    data = new TextEncoder().encode(data)
+    // String input
+    if (typeof data === 'string') {
+      data = new TextEncoder().encode(data)
+    }
 
     return crypto.subtle
       .encrypt(algorithm, key, data)
@@ -58,11 +61,15 @@ class AES_GCM {
         let tag = result.slice(result.byteLength - tagLength)
         let ciphertext = result.slice(0, -tagLength)
 
-        return {
+        return Object.assign({
           iv: base64url(Buffer.from(algorithm.iv)),
           ciphertext: base64url(Buffer.from(ciphertext)),
           tag: base64url(Buffer.from(tag))
-        }
+        },
+        algorithm.additionalData && algorithm.additionalData.length > 0
+          ? { aad: base64url(Buffer.from(algorithm.additionalData)) }
+          : {}
+        )
       })
   }
 
@@ -74,10 +81,10 @@ class AES_GCM {
    * checking for integrity using the tag provided.
    *
    * @param {CryptoKey} key
-   * @param {string} ciphertext
-   * @param {string} iv
-   * @param {string} tag
-   * @param {string} aad
+   * @param {string} ciphertext - Base64URL encoded cipher text.
+   * @param {string} iv - Base64URL encoded intialization vector.
+   * @param {string} tag - Base64URL encoded authentication tag.
+   * @param {string} [aad] - Base64URL encoded addtional authenticated data.
    *
    * @return {Promise}
    */
@@ -88,10 +95,10 @@ class AES_GCM {
       configurable: true,
       value: Uint8Array.from(base64url.toBuffer(iv))
     })
-    Object.defineProperty(algorithm, 'aad', {
+    Object.defineProperty(algorithm, 'additionalData', {
       enumerable: false,
       configurable: true,
-      value: aad
+      value: aad ? Uint8Array.from(base64url.toBuffer(aad)) : undefined
     })
 
     // Decode ciphertext and tag from base64

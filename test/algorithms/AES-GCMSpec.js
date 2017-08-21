@@ -155,6 +155,13 @@ describe('AES-GCM', () => {
     })
 
     describe('with aad', () => {
+
+      it('should reject if the aad is omitted', () => {
+        return ec.decrypt(key, encryptedWithAad.ciphertext,
+          encryptedWithAad.iv, encryptedWithAad.tag)
+          .should.be.rejected
+      })
+
       it('should decrypt with aad', () => {
         return ec.decrypt(key, encryptedWithAad.ciphertext,
           encryptedWithAad.iv, encryptedWithAad.tag, encryptedWithAad.aad)

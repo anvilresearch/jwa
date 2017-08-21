@@ -29,14 +29,17 @@ class ECDSA {
    * Generate a digital signature for a given input and private key.
    *
    * @param {CryptoKey} key
-   * @param {BufferSource} data
+   * @param {(BufferSource|String)} data
    *
    * @returns {Promise}
    */
   sign (key, data) {
     let algorithm = this.params
 
-    data = new TextEncoder().encode(data)
+    // String input
+    if (typeof data === 'string') {
+      data = new TextEncoder().encode(data)
+    }
 
     return crypto.subtle
       .sign(algorithm, key, data)
@@ -50,8 +53,8 @@ class ECDSA {
    * Verify a digital signature for a given input and private key.
    *
    * @param {CryptoKey} key
-   * @param {BufferSource} signature
-   * @param {BufferSource} data
+   * @param {(BufferSource|String)} signature - Base64URL encoded signature.
+   * @param {(BufferSource|String)} data
    *
    * @returns {Promise}
    */
@@ -101,7 +104,7 @@ class ECDSA {
     let usages = key['key_ops'] || []
     // duplicate key operation values MUST NOT be present
     if (!(usages.length === new Set(usages).size)) {
-      throw new Error('Invalid key operations key parameter')
+      return Promise.reject(new Error('Invalid key operations key parameter'))
     }
     // handle use parameter for public keys
     if (key.use === 'sig') {

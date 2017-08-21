@@ -54,6 +54,12 @@ describe('SupportedAlgorithms', () => {
   })
 
   describe('normalize', () => {
+    it('should return SyntaxError for an invalid operation', () => {
+      let supportedAlgorithms = new SupportedAlgorithms()
+      supportedAlgorithms.normalize('encode', 'RS256')
+        .should.be.instanceof(SyntaxError)
+    })
+
     it('should return a registered algorithm for an operation by name', () => {
       let supportedAlgorithms = new SupportedAlgorithms()
       let argument = {}

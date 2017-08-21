@@ -31,7 +31,7 @@ class HMAC {
    * or greater than the bitlength.
    *
    * @param {CryptoKey} key
-   * @param {string} data
+   * @param {(BufferSource|String)} data
    *
    * @returns {string}
    */
@@ -40,7 +40,10 @@ class HMAC {
 
     // TODO: validate key length
 
-    data = new TextEncoder().encode(data)
+    // String input
+    if (typeof data === 'string') {
+      data = new TextEncoder().encode(data)
+    }
 
     return crypto.subtle
       .sign(algorithm, key, data)
@@ -54,8 +57,8 @@ class HMAC {
    * Verify a digital signature for a given input and private key.
    *
    * @param {CryptoKey} key
-   * @param {string} signature
-   * @param {string} data
+   * @param {(BufferSource|String)} signature - Base64URL encoded signature.
+   * @param {(BufferSource|String)} data
    *
    * @returns {Boolean}
    */
@@ -104,7 +107,7 @@ class HMAC {
     let usages = key['key_ops'] || []
     // duplicate key operation values MUST NOT be present
     if (!(usages.length === new Set(usages).size)) {
-      throw new Error('Invalid key operations key parameter')
+      return Promise.reject(new Error('Invalid key operations key parameter'))
     }
 
     return crypto.subtle
@@ -125,11 +128,11 @@ class HMAC {
    * @description Assert that the key length is sufficient
    * @param {string} key
    */
-  assertSufficientKeyLength (key) {
-    if (key.length < this.bitlength) {
-      throw new Error('The key is too short.')
-    }
-  }
+  // assertSufficientKeyLength (key) {
+  //   if (key.length < this.bitlength) {
+  //     throw new Error('The key is too short.')
+  //   }
+  // }
 }
 
 /**

@@ -81,29 +81,48 @@ class AES_GCM {
    * checking for integrity using the tag provided.
    *
    * @param {CryptoKey} key
-   * @param {string} ciphertext - Base64URL encoded cipher text.
-   * @param {string} iv - Base64URL encoded intialization vector.
-   * @param {string} tag - Base64URL encoded authentication tag.
-   * @param {string} [aad] - Base64URL encoded addtional authenticated data.
+   * @param {(BufferSource|String)} ciphertext - Base64URL encoded cipher text.
+   * @param {(BufferSource|String)} iv - Base64URL encoded intialization vector.
+   * @param {(BufferSource|String)} tag - Base64URL encoded authentication tag.
+   * @param {(BufferSource|String)} [aad] - Base64URL encoded additional authenticated data.
    *
    * @return {Promise}
    */
   decrypt (key, ciphertext, iv, tag, aad) {
     let algorithm = this.params
+    // String input
+    if (typeof iv === 'string') {
+      iv = Uint8Array.from(base64url.toBuffer(iv))
+    } else {
+      iv = Uint8Array.from(iv)
+    }
     Object.defineProperty(algorithm, 'iv', {
       enumerable: false,
       configurable: true,
-      value: Uint8Array.from(base64url.toBuffer(iv))
+      value: iv
     })
+    if (aad) {
+      if (typeof aad === 'string') {
+        aad = Uint8Array.from(base64url.toBuffer(aad))
+      } else {
+        aad = Uint8Array.from(aad)
+      }
+    }
     Object.defineProperty(algorithm, 'additionalData', {
       enumerable: false,
       configurable: true,
-      value: aad ? Uint8Array.from(base64url.toBuffer(aad)) : undefined
+      value: aad ? aad : undefined
     })
 
     // Decode ciphertext and tag from base64
-    ciphertext = base64url.toBuffer(ciphertext)
-    tag = base64url.toBuffer(tag)
+    // String input
+    if (typeof ciphertext === 'string') {
+      ciphertext = base64url.toBuffer(ciphertext)
+    }
+    // String input
+    if (typeof tag === 'string') {
+      tag = base64url.toBuffer(tag)
+    }
 
     // Concatenate the two buffers
     let data = new Uint8Array(ciphertext.length + tag.length)

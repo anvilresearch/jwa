@@ -75,8 +75,16 @@ describe('RSASSA_PKCS1_v1_5', () => {
 
     it('should reject an insufficient key length')
 
-    it('should resolve a base64url encoded value', () => {
+    it('should resolve a base64url encoded value for string input', () => {
       return rsa.sign(RsaPrivateCryptoKey, data)
+        .then(signature => {
+          base64url.toBuffer(signature)
+            .should.eql(Buffer.from(chromeRsaSignature))
+        })
+    })
+
+    it('should resolve a base64url encoded value for buffer input', () => {
+      return rsa.sign(RsaPrivateCryptoKey, Buffer.from(data))
         .then(signature => {
           base64url.toBuffer(signature)
             .should.eql(Buffer.from(chromeRsaSignature))
@@ -117,18 +125,28 @@ describe('RSASSA_PKCS1_v1_5', () => {
           verified.should.equal(true)
         })
     })
+
+    it('should resolve a boolean', () => {
+      let sigBuffer = base64url.toBuffer(signature)
+      let dataBuffer = Buffer.from(data)
+      return rsa.verify(RsaPublicCryptoKey, sigBuffer, dataBuffer)
+        .then(verified => {
+          verified.should.equal(true)
+        })
+    })
   })
 
   /**
    * generateKey
    */
   describe('generateKey', () => {
-    let promise, result, alg, rsa
+    let promise, result, alg, rsa, modulusLength
 
     before(() => {
       alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: 'SHA-256' } }
 
       rsa = new RSASSA_PKCS1_v1_5(alg)
+      modulusLength = 1024
 
       promise = rsa.generateKey(true, ["sign"])
       promise.then(jwk => {
@@ -145,6 +163,18 @@ describe('RSASSA_PKCS1_v1_5', () => {
       result.should.have.property('privateKey')
       result.publicKey.algorithm.should.eql(alg)
       result.privateKey.algorithm.should.eql(alg)
+    })
+
+    it('should create a CryptoKeyPair', () => {
+      rsa.generateKey(true, [], {modulusLength})
+      .then(result => {
+        result.should.have.property('publicKey')
+        result.should.have.property('privateKey')
+        result.publicKey.algorithm.should.eql(alg)
+        result.publicKey.algorithm.modulusLength.should.eql(1024)
+        result.privateKey.algorithm.should.eql(alg)
+        result.privateKey.algorithm.modulusLength.should.eql(1024)
+      })
     })
   })
 
@@ -168,6 +198,20 @@ describe('RSASSA_PKCS1_v1_5', () => {
       })
     })
 
+    it('should reject duplicate key use', () => {
+      let wrongKey = Object.assign({}, RsaPublicJwk)
+      wrongKey.key_ops = ["verify", "verify"]
+      return rsa.importKey(wrongKey)
+        .should.be.rejectedWith('Invalid key operations key parameter')
+    })
+
+    it('should not duplicate existent key use', () => {
+      let key = Object.assign({}, RsaPrivateJwk)
+      key.key_ops = ["sign"]
+      return rsa.importKey(key)
+        .should.be.fullfilled
+    })
+
     it('should return a promise', () => {
       privatePromise.should.be.instanceof(Promise)
       publicPromise.should.be.instanceof(Promise)
@@ -176,7 +220,8 @@ describe('RSASSA_PKCS1_v1_5', () => {
     it('should reject "enc" use', () => {
       let wrongKey = Object.assign({}, RsaPublicJwk)
       wrongKey.use = "enc"
-      return rsa.importKey(wrongKey).should.be.rejectedWith(Error)
+      return rsa.importKey(wrongKey)
+        .should.be.rejectedWith('Invalid use key parameter')
     })
 
     it('should resolve a JWK', () => {

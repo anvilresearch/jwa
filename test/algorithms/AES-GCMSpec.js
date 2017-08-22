@@ -97,6 +97,13 @@ describe('AES-GCM', () => {
         })
     })
 
+    it('should perform encryption', () => {
+      return ec.encrypt(key, Buffer.from(data))
+        .then(result => {
+          result.should.not.eql(Buffer.from(data))
+        })
+    })
+
     it('should contain ciphertext, iv and tag', () => {
       return ec.encrypt(key, data)
         .then(result => {
@@ -154,6 +161,15 @@ describe('AES-GCM', () => {
         })
     })
 
+    it('should recover plaintext with buffer input', () => {
+      return ec.decrypt(key, base64url.toBuffer(encryptedWithoutAad.ciphertext),
+        base64url.toBuffer(encryptedWithoutAad.iv),
+        base64url.toBuffer(encryptedWithoutAad.tag))
+        .then(result => {
+          result.should.eql(encryptedWithoutAad.data)
+        })
+    })
+
     describe('with aad', () => {
 
       it('should reject if the aad is omitted', () => {
@@ -165,6 +181,13 @@ describe('AES-GCM', () => {
       it('should decrypt with aad', () => {
         return ec.decrypt(key, encryptedWithAad.ciphertext,
           encryptedWithAad.iv, encryptedWithAad.tag, encryptedWithAad.aad)
+          .should.eventually.equal(data)
+      })
+
+      it('should decrypt with buffer aad', () => {
+        return ec.decrypt(key, encryptedWithAad.ciphertext,
+          encryptedWithAad.iv, encryptedWithAad.tag,
+          base64url.toBuffer(encryptedWithAad.aad))
           .should.eventually.equal(data)
       })
     })

@@ -73,9 +73,18 @@ describe('HMAC', () => {
 
     it('should reject an insufficient key length')
 
-    it('should resolve a base64url encoded value', () => {
+    it('should resolve a base64url encoded value with string input', () => {
       let hmac = new HMAC(alg)
       return hmac.sign(importedHmacKey, data)
+        .then(signature => {
+          base64url.toBuffer(signature)
+            .should.eql(Buffer.from(chromeHmacSignature.buffer))
+        })
+    })
+
+    it('should resolve a base64url encoded value with buffer input', () => {
+      let hmac = new HMAC(alg)
+      return hmac.sign(importedHmacKey, Buffer.from(data))
         .then(signature => {
           base64url.toBuffer(signature)
             .should.eql(Buffer.from(chromeHmacSignature.buffer))
@@ -111,12 +120,24 @@ describe('HMAC', () => {
 
     it('should return a promise', () => {
       let hmac = new HMAC(alg)
-      hmac.verify(importedHmacKey, signature, data).should.be.instanceof(Promise)
+      return hmac.verify(importedHmacKey, signature, data)
+        .should.be.instanceof(Promise)
     })
 
-    it('should resolve a boolean', () => {
+    it('should resolve a boolean with string input', () => {
       let hmac = new HMAC(alg)
       return hmac.verify(importedHmacKey, signature, data)
+        .then(verified => {
+          expect(verified).to.equal(true)
+        })
+
+    })
+
+    it('should resolve a boolean with buffer input', () => {
+      let hmac = new HMAC(alg)
+      let sigBuffer = base64url.toBuffer(signature)
+      let dataBuffer = Buffer.from(data)
+      return hmac.verify(importedHmacKey, sigBuffer, dataBuffer)
         .then(verified => {
           expect(verified).to.equal(true)
         })
@@ -167,13 +188,24 @@ describe('HMAC', () => {
       hmac.importKey(hmacJwk).should.be.instanceof(Promise)
     })
 
+    it('should reject duplicate key operations', () => {
+      let hmac = new HMAC(alg)
+      let key = {
+        "kty":"oct",
+        "k":`AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75
+           aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow`,
+        "key_ops": ["sign", "sign"]
+      }
+      return hmac.importKey(key)
+        .should.be.rejectedWith('Invalid key operations key parameter')
+    })
+
     it('should resolve a JWK import', () => {
       let hmac = new HMAC(alg)
       return hmac.importKey(hmacJwk)
         .then(imported => {
           imported.cryptoKey.constructor.name.should.equal('CryptoKey')
         })
-
     })
   })
 })

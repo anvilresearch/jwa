@@ -73,8 +73,12 @@ describe('ECDSA', () => {
 
     it('should reject an insufficient key length')
 
-    it('should resolve a base64url encoded value', () => {
+    it('should resolve a base64url encoded value with string input', () => {
       return ec.sign(privateKey, data).should.be.fulfilled
+    })
+
+    it('should resolve a base64url encoded value with buffer input', () => {
+      return ec.sign(privateKey, Buffer.from(data)).should.be.fulfilled
     })
   })
 
@@ -98,8 +102,16 @@ describe('ECDSA', () => {
         .should.be.instanceof(Promise)
     })
 
-    it('should resolve a boolean', () => {
+    it('should resolve a boolean with string input', () => {
       return ec.verify(publicKey, signature, data)
+        .then(verified => {
+          verified.should.equal(true)
+        })
+    })
+
+    it('should resolve a boolean with buffer input', () => {
+      let sigBuffer = base64url.toBuffer(signature)
+      return ec.verify(publicKey, sigBuffer, Buffer.from(data))
         .then(verified => {
           verified.should.equal(true)
         })
@@ -157,6 +169,31 @@ describe('ECDSA', () => {
       let wrongKey = Object.assign({}, ECPublicJwk)
       wrongKey.use = "enc"
       return ec.importKey(wrongKey).should.be.rejectedWith(Error)
+    })
+
+    it('should reject duplicate key use', () => {
+      let wrongKey = {
+        "kty":"EC",
+        "crv":"P-256",
+        "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+        "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+        "kid":"1"
+      }
+      wrongKey.key_ops = ["sign", "sign"]
+      return ec.importKey(wrongKey)
+        .should.be.rejectedWith('Invalid key operations key parameter')
+    })
+
+    it('should construct unspecified key use', () => {
+      let key = {
+        "kty":"EC",
+        "crv":"P-256",
+        "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+        "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+        "kid":"1"
+      }
+      return ec.importKey(key)
+        .should.be.fulfilled
     })
 
     it('should resolve a JWK', () => {

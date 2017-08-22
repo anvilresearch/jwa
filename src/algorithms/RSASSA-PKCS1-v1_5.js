@@ -29,7 +29,7 @@ class RSASSA_PKCS1_v1_5 {
    * Generate a digital signature for a given input and private key.
    *
    * @param {CryptoKey} key
-   * @param {BufferSource} data
+   * @param {(BufferSource|String)} data
    *
    * @returns {Promise}
    */
@@ -45,7 +45,10 @@ class RSASSA_PKCS1_v1_5 {
     //  )
     //}
 
-    data = new TextEncoder().encode(data)
+    // Normalize data input
+    if (typeof data === 'string') {
+      data = new TextEncoder().encode(data)
+    }
 
     return crypto.subtle
       .sign(algorithm, key, data)
@@ -59,24 +62,26 @@ class RSASSA_PKCS1_v1_5 {
    * Verify a digital signature for a given input and private key.
    *
    * @param {CryptoKey} key
-   * @param {BufferSource} signature
-   * @param {BufferSource} data
+   * @param {(BufferSource|String)} signature - Base64URL encoded signature.
+   * @param {(BufferSource|String)} data
    *
    * @returns {Promise}
    */
   verify (key, signature, data) {
     let algorithm = this.params
 
+    // Normalize signature
     if (typeof signature === 'string') {
       signature = Uint8Array.from(base64url.toBuffer(signature))
     }
 
+    // Normalize data to be verified
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }
-    // ...
 
-    return crypto.subtle.verify(algorithm, key, signature, data)
+    return crypto.subtle
+      .verify(algorithm, key, signature, data)
   }
 
   /**
@@ -113,7 +118,7 @@ class RSASSA_PKCS1_v1_5 {
     let usages = key['key_ops'] || []
     // duplicate key operation values MUST NOT be present
     if (!(usages.length === new Set(usages).size)) {
-      throw new Error('Invalid key operations key parameter')
+      return Promise.reject(new Error('Invalid key operations key parameter'))
     }
     if (!usages.includes('verify') && (key.use === 'sig' || !key.d)) {
       usages.push('verify')
@@ -127,8 +132,6 @@ class RSASSA_PKCS1_v1_5 {
       if (!usages.includes('sign')) {
         usages.push('sign')
       }
-    } else if (!usages.includes('verify')) {
-      usages.push('verify')
     }
 
     return crypto.subtle

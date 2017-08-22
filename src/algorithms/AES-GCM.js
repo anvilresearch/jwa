@@ -115,6 +115,7 @@ class AES_GCM {
         aad = Uint8Array.from(aad)
       }
     }
+
     // Assign non-enumerable aad only if used
     Object.defineProperty(algorithm, 'additionalData', {
       enumerable: false,
@@ -127,6 +128,7 @@ class AES_GCM {
     if (typeof ciphertext === 'string') {
       ciphertext = base64url.toBuffer(ciphertext)
     }
+    
     // String input
     if (typeof tag === 'string') {
       tag = base64url.toBuffer(tag)

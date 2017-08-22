@@ -45,7 +45,7 @@ class RSASSA_PKCS1_v1_5 {
     //  )
     //}
 
-    // String input
+    // Normalize data input
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }
@@ -70,16 +70,18 @@ class RSASSA_PKCS1_v1_5 {
   verify (key, signature, data) {
     let algorithm = this.params
 
+    // Normalize signature
     if (typeof signature === 'string') {
       signature = Uint8Array.from(base64url.toBuffer(signature))
     }
 
+    // Normalize data to be verified
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }
-    // ...
 
-    return crypto.subtle.verify(algorithm, key, signature, data)
+    return crypto.subtle
+      .verify(algorithm, key, signature, data)
   }
 
   /**

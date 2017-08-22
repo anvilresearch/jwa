@@ -36,7 +36,7 @@ class ECDSA {
   sign (key, data) {
     let algorithm = this.params
 
-    // String input
+    // Normalize data input
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }
@@ -61,10 +61,12 @@ class ECDSA {
   verify (key, signature, data) {
     let algorithm = this.params
 
+    // Normalize signature
     if (typeof signature === 'string') {
       signature = Uint8Array.from(base64url.toBuffer(signature))
     }
 
+    // Normalize data to be verified
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }

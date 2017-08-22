@@ -36,19 +36,21 @@ class AES_GCM {
    */
   encrypt (key, data, aad) {
     let algorithm = Object.assign({}, this.params)
+
     // ensure each encryption has a new iv
     Object.defineProperty(algorithm, 'iv', {
       enumerable: false,
       configurable: true,
       value: crypto.getRandomValues(new Uint8Array(16))
     })
+
     Object.defineProperty(algorithm, 'additionalData', {
       enumerable: false,
       configurable: true,
       value: typeof aad === 'string' ? new TextEncoder().encode(aad) : aad
     })
 
-    // String input
+    // Normalize data input
     if (typeof data === 'string') {
       data = new TextEncoder().encode(data)
     }
@@ -90,17 +92,22 @@ class AES_GCM {
    */
   decrypt (key, ciphertext, iv, tag, aad) {
     let algorithm = this.params
-    // String input
+
+    // Normalize iv input
     if (typeof iv === 'string') {
       iv = Uint8Array.from(base64url.toBuffer(iv))
     } else {
       iv = Uint8Array.from(iv)
     }
+
+    // Assign non-enumerable iv
     Object.defineProperty(algorithm, 'iv', {
       enumerable: false,
       configurable: true,
       value: iv
     })
+
+    // Normalize aad if present
     if (aad) {
       if (typeof aad === 'string') {
         aad = Uint8Array.from(base64url.toBuffer(aad))
@@ -108,6 +115,7 @@ class AES_GCM {
         aad = Uint8Array.from(aad)
       }
     }
+    // Assign non-enumerable aad only if used
     Object.defineProperty(algorithm, 'additionalData', {
       enumerable: false,
       configurable: true,

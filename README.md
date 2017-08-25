@@ -1,6 +1,8 @@
 # JWA _(@trust/jwa)_
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![Build Status](https://travis-ci.org/anvilresearch/jwa.svg?branch=master)](https://travis-ci.org/anvilresearch/jwa)
+[![codecov](https://codecov.io/gh/anvilresearch/jwa/branch/master/graph/badge.svg)](https://codecov.io/gh/anvilresearch/jwa)
 
 > JSON Web Algorithm for Node.js and Browsers
 
